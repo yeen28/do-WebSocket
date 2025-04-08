@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket 채팅방</title>
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+    <!-- Thymeleaf에서 전달된 roomId를 JavaScript에서 사용하기 위한 hidden input -->
+    <input type="hidden" id="roomIdValue" th:value="${roomId}">
+
+    <div id="username-page" class="login-container">
+        <h2>채팅방 입장</h2>
+        <form id="usernameForm">
+            <div>
+                <input type="text" id="username" placeholder="사용자 이름을 입력하세요" required>
+            </div>
+            <button type="submit">입장하기</button>
+        </form>
+    </div>
+
+    <div id="chat-page" class="chat-container" style="display: none;">
+        <div class="chat-header">
+            <div id="room-name">채팅방</div>
+        </div>
+        <div id="messageArea" class="chat-messages"></div>
+        <form id="messageForm" class="chat-input">
+            <input type="text" id="message" placeholder="메시지를 입력하세요..." autocomplete="off">
+            <button type="submit">전송</button>
+        </form>
+    </div>
+
+    <script th:src="@{/js/chat.js}"></script>
+</body>
+</html> 
