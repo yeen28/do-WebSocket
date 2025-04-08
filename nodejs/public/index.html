@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO Chat</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        #chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        #messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        #user-list {
+            float: right;
+            width: 200px;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-left: 20px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .message .username {
+            font-weight: bold;
+            color: #333;
+        }
+        .message .content {
+            margin-left: 5px;
+        }
+        #form {
+            display: flex;
+            gap: 10px;
+        }
+        #input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .system-message {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="user-list">
+            <h3>Online Users</h3>
+            <ul id="users"></ul>
+        </div>
+        <div id="messages"></div>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" placeholder="Type a message..." />
+            <button>Send</button>
+        </form>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
+        const usersList = document.getElementById('users');
+
+        // Prompt for username
+        const username = prompt('Please enter your username:');
+        socket.emit('join', username);
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
+        });
+
+        socket.on('chat message', (data) => {
+            const item = document.createElement('div');
+            item.className = 'message';
+            item.innerHTML = `<span class="username">${data.username}:</span> <span class="content">${data.message}</span>`;
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
+        });
+
+        socket.on('user joined', (username) => {
+            const item = document.createElement('div');
+            item.className = 'system-message';
+            item.textContent = `${username} joined the chat`;
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
+        });
+
+        socket.on('user left', (username) => {
+            const item = document.createElement('div');
+            item.className = 'system-message';
+            item.textContent = `${username} left the chat`;
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
+        });
+
+        socket.on('user list', (users) => {
+            usersList.innerHTML = '';
+            users.forEach(user => {
+                const item = document.createElement('li');
+                item.textContent = user;
+                usersList.appendChild(item);
+            });
+        });
+    </script>
+</body>
+</html>
